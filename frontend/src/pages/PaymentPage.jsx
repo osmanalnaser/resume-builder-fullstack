@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
 
-const API_BASE = 'https://resume-builder-fullstack-production.up.railway.app'
+const API_BASE = 'https://resume-builder-fullstack-production.up.railway.app/api'
 
 export default function PaymentPage() {
   const navigate = useNavigate()

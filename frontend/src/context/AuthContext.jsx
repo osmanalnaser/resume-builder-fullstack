@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const AuthContext = createContext()
 
-const API_BASE = 'https://resume-builder-fullstack-production.up.railway.app'
+const API_BASE = 'https://resume-builder-fullstack-production.up.railway.app/api'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
