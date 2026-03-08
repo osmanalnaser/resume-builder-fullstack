@@ -60,8 +60,8 @@ public class PaymentService {
         paypalPayment.setTransactions(transactions);
 
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setReturnUrl("http://localhost:5173/payment/success");
-        redirectUrls.setCancelUrl("http://localhost:5173/payment/cancel");
+        redirectUrls.setReturnUrl("https://resume-craft-fullstack.vercel.app/payment/success");
+        redirectUrls.setCancelUrl("https://resume-craft-fullstack.vercel.app/payment/cancel");
         paypalPayment.setRedirectUrls(redirectUrls);
 
         // Step 3: Create order
