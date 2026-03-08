@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-const API_BASE = 'http://localhost:8080/api'
+const API_BASE = 'https://resume-builder-fullstack-production.up.railway.app'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
