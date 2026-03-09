@@ -49,7 +49,7 @@ public class AuthService {
     private void sendVerificationEmail(User newUser) {
         log.info("Inside AuthService - sendVerificationEmail(): {}", newUser);
         try {
-            String link = appBaseUrl + "/api/auth/verify-email?token=" + newUser.getVerificationToken();
+            String link = "https://resume-builder-fullstack.vercel.app/verify-email?token=" + newUser.getVerificationToken();
             String html =
                     "<div style='font-family:sans-serif'>" +
                             "<h2>Verify your email</h2>" +

@@ -5,6 +5,7 @@ import ResumeEditor from './pages/ResumeEditor'
 import ProtectedRoute from './components/ProtectedRoute'
 import PaymentPage from './pages/PaymentPage'
 import TemplatesPage from './pages/TemplatesPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
         } />
         <Route path="/templates" element={
           <TemplatesPage />
+        } />
+        <Route path="/verify-email" element={
+          <VerifyEmailPage />
         } />
       </Routes>
     </BrowserRouter>
