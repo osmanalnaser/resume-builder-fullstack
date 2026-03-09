@@ -1,53 +1,43 @@
 package in.osmanalnaser.resumebuilderapi.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    @Value("${spring.mail.properties.mail.smtp.from}")
+    @Value("${sendgrid.api-key}")
+    private String sendGridApiKey;
+
+    @Value("${sendgrid.from-email}")
     private String fromEmail;
 
-    private final JavaMailSender mailSender;
+    public void sendHtmlEmail(String to, String subject, String htmlContent) {
+        Email from = new Email(fromEmail);
+        Email toEmail = new Email(to);
+        Content content = new Content("text/html", htmlContent);
+        Mail mail = new Mail(from, subject, toEmail, content);
 
-    public void sendHtmlEmail(String to, String subject, String htmlContent) throws MessagingException {
-       log.info("Inside EmailService - sendHtmlEmail(): {}, {}, {}", to, subject, htmlContent);
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = null;
-        helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setFrom(fromEmail);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(htmlContent, true);
-        mailSender.send(message);
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            log.info("SendGrid response status: {}", response.getStatusCode());
+        } catch (IOException e) {
+            log.error("Failed to send email via SendGrid: {}", e.getMessage());
+            throw new RuntimeException("Failed to send email: " + e.getMessage());
+        }
     }
-
-    public void sendEmailWithAttachment(String to,
-                                        String subject,
-                                        String body,
-                                        byte[] attachment,
-                                        String filename) throws MessagingException {
-
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(fromEmail);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(body);
-        helper.addAttachment(filename, new ByteArrayResource(attachment));
-        mailSender.send(message);
-    }
-
 }
-
