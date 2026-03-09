@@ -25,24 +25,12 @@ public class PaymentController {
     @PostMapping("/create-order")
     public ResponseEntity<?> creatOrder(@RequestBody Map<String, String> request,
                                         Authentication authentication) throws Exception {
-        //validate the request
         String planType = request.get("planType");
         if (!PREMIUM.equalsIgnoreCase(planType)){
             return ResponseEntity.badRequest().body(Map.of("message", "Invalid plan type"));
         }
 
-        //Step 1: Call the service method
-        Payment payment = paymentService.createOrder(authentication.getPrincipal(), planType);
-
-        //Step 2: Prepare the response object
-        Map<String, Object> response = Map.of(
-                "orderId", payment.getPaypalOrderId(),
-                "amount", payment.getAmount(),
-                "currency", payment.getCurrency(),
-                "receipt", payment.getReceipt()
-        );
-
-        //Step 3: return the response
+        Map<String, Object> response = paymentService.createOrder(authentication.getPrincipal(), planType);
         return ResponseEntity.ok(response);
     }
 

@@ -7,16 +7,17 @@ import in.osmanalnaser.resumebuilderapi.repository.PaymentRepository;
 import in.osmanalnaser.resumebuilderapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.paypal.api.payments.Payer;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
 import static in.osmanalnaser.resumebuilderapi.util.AppConstants.PREMIUM;
 
@@ -34,7 +35,8 @@ public class PaymentService {
     @Value("${paypal.client-secret}")
     private String paypalKeySecret;
 
-    public Payment createOrder(Object principal, String planType) throws Exception {
+    public Map<String, Object> createOrder(Object principal, String planType) throws Exception {
+        
         AuthResponse authResponse = authService.getProfile(principal);
 
         // Step 1: Initialize PayPal client
@@ -60,8 +62,8 @@ public class PaymentService {
         paypalPayment.setTransactions(transactions);
 
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setReturnUrl("https://resume-craft-fullstack.vercel.app/payment/success");
-        redirectUrls.setCancelUrl("https://resume-craft-fullstack.vercel.app/payment/cancel");
+        redirectUrls.setReturnUrl("https://resume-builder-fullstack.vercel.app/payment/success");
+        redirectUrls.setCancelUrl("https://resume-builder-fullstack.vercel.app/payment/cancel");
         paypalPayment.setRedirectUrls(redirectUrls);
 
         // Step 3: Create order
@@ -78,7 +80,20 @@ public class PaymentService {
                 .receipt(PREMIUM + "_" + UUID.randomUUID().toString().substring(0, 8))
                 .build();
 
-        return paymentRepository.save(newPayment);
+        Payment savedPayment = paymentRepository.save(newPayment);
+
+        String approvalUrl = createdPayment.getLinks().stream()
+            .filter(link -> "approval_url".equals(link.getRel()))
+            .findFirst()
+            .map(link -> link.getHref())
+            .orElseThrow(() -> new RuntimeException("No approval URL found"));
+
+        return Map.of(
+            "orderId", savedPayment.getPaypalOrderId(),
+            "approvalUrl", approvalUrl,
+            "amount", savedPayment.getAmount(),
+            "currency", savedPayment.getCurrency()
+        );
     }
 
     public boolean verifyPayment(String paypalOrderId, String paypalPaymentId, String paypalSignature) {
