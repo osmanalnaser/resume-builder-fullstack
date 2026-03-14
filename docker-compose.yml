@@ -29,7 +29,7 @@ services:
       - mongodb
 
   frontend:
-    build: ./backend
+    build: ./frontend
     container_name: frontend
     ports:
       - "80:80"

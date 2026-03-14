@@ -31,7 +31,7 @@ public class ResumeController {
     private final ResumeService resumeService;
     private final FileUploadService fileUploadService;
 
-    @PostMapping
+    @PostMapping(CREATE)
     public ResponseEntity<?> createResume(@Valid @RequestBody CreateResumeRequest request,
                                           Authentication authentication) {
         //Step 1: Call the service method
@@ -40,7 +40,7 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newResume);
     }
 
-    @GetMapping
+    @GetMapping(GET)
     public ResponseEntity<?> getUserResume(Authentication authentication) {
         //Step 1: Call the serivce method
         List<Resume> resumes = resumeService.getUserResumes(authentication.getPrincipal());
